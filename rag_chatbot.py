@@ -10,14 +10,18 @@ from fastapi import FastAPI, Request
 from pydantic import BaseModel
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
+from dotenv import load_dotenv
+
+load_dotenv()
 
 nltk.download("punkt")
 nltk.download('punkt_tab')
 # === CONFIG ===
-GEMINI_API_KEY = "AIzaSyBlC2U2XnfmwfsHglFcxlISJVdulq6FvXM"
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+
 genai.configure(api_key=GEMINI_API_KEY)
 
-MODEL_NAME = "models/gemini-2.5-pro"
+MODEL_NAME = "models/gemini-1.5-flash"
 SHORT_TERM_LIMIT = 10
 
 # === PREPROCESS ===
