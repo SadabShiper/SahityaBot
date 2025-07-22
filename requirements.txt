@@ -1,0 +1,8 @@
+faiss-cpu 
+sentence-transformers
+google-generativeai
+nltk
+tqdm
+fastapi
+uvicorn
+python-multipart
