@@ -12,7 +12,7 @@ from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 
 nltk.download("punkt")
-
+nltk.download('punkt_tab')
 # === CONFIG ===
 GEMINI_API_KEY = "AIzaSyBlC2U2XnfmwfsHglFcxlISJVdulq6FvXM"
 genai.configure(api_key=GEMINI_API_KEY)
