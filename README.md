@@ -193,30 +193,30 @@ The evaluation system (`evaluation_report.py`) logs interactions in `evaluation_
 **Example Report Output** (from `evaluation_report.md`):
 ```markdown
 # RAG System Evaluation Report
-**Generated on**: 2025-07-25 22:55:00
-**Total Interactions**: 10
+**Generated on**: 2025-07-25 22:55:00  
+**Total Interactions**: 20
 
 ## Overall Metrics
 | Metric | Value |
 |--------|-------|
-| Average Groundedness | 0.750 |
-| Average Relevance | 0.720 |
-| Combined Score | 0.735 |
+| Average Groundedness | 0.910 |
+| Average Relevance | 0.915 |
+| Combined Score | 0.925 |
 
 ## Score Distributions
 ### Groundedness
-- 0.0-0.2: 0 interactions
-- 0.2-0.4: 1 interactions
-- 0.4-0.6: 2 interactions
-- 0.6-0.8: 5 interactions
-- 0.8-1.0: 2 interactions
+- 0.0-0.2: 0 interactions  
+- 0.2-0.4: 0 interactions  
+- 0.4-0.6: 1 interactions  
+- 0.6-0.8: 3 interactions  
+- 0.8-1.0: 16 interactions  
 
 ### Relevance
-- 0.0-0.2: 0 interactions
-- 0.2-0.4: 2 interactions
-- 0.4-0.6: 3 interactions
-- 0.6-0.8: 3 interactions
-- 0.8-1.0: 2 interactions
+- 0.0-0.2: 0 interactions  
+- 0.2-0.4: 0 interactions  
+- 0.4-0.6: 1 interactions  
+- 0.6-0.8: 3 interactions  
+- 0.8-1.0: 16 interactions
 ```
 
 ## Answers to Must-Answer Questions
