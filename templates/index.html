@@ -1,22 +1,390 @@
 <!DOCTYPE html>
-<html lang="bn">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>বাংলা RAG চ্যাটবট</title>
-    <link rel="stylesheet" href="/static/css/style.css">
+    <title>SahityaBot</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Add to your existing styles */
+.chat-message {
+    display: flex;
+    margin-bottom: 1rem;
+    animation: messageEnter 0.3s ease-out forwards;
+}
+
+.user-message {
+    justify-content: flex-end;
+}
+
+.bot-message {
+    justify-content: flex-start;
+}
+
+.message-bubble {
+    max-width: 80%;
+    padding: 0.75rem 1rem;
+    border-radius: 1rem;
+    word-wrap: break-word;
+}
+
+.user-bubble {
+    background: linear-gradient(to right, #ef4444, #dc2626);
+    color: white;
+    border-top-right-radius: 0.25rem;
+}
+
+.bot-bubble {
+    background: rgba(31, 41, 55, 0.9);
+    color: #f3f4f6;
+    border: 1px solid rgba(55, 65, 81, 1);
+    border-top-left-radius: 0.25rem;
+}
+
+.streaming-bubble {
+    min-height: 2.5rem; /* Ensure consistent height during streaming */
+}
+        .typing-dots {
+            display: inline-flex;
+            align-items: center;
+            height: 17px;
+        }
+        .typing-dots span {
+            width: 8px;
+            height: 8px;
+            margin: 0 2px;
+            background-color: #ef4444;
+            border-radius: 50%;
+            display: inline-block;
+            animation: bounce 1.4s infinite ease-in-out both;
+        }
+        .typing-dots span:nth-child(1) {
+            animation-delay: -0.32s;
+        }
+        .typing-dots span:nth-child(2) {
+            animation-delay: -0.16s;
+        }
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+        .chat-container {
+            scrollbar-width: thin;
+            scrollbar-color: #4b5563 #1f2937;
+        }
+        .chat-container::-webkit-scrollbar {
+            width: 6px;
+        }
+        .chat-container::-webkit-scrollbar-track {
+            background: #1f2937;
+        }
+        .chat-container::-webkit-scrollbar-thumb {
+            background-color: #4b5563;
+            border-radius: 3px;
+        }
+        .sidebar {
+            scrollbar-width: thin;
+            scrollbar-color: #4b5563 #111827;
+        }
+        .sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .sidebar::-webkit-scrollbar-track {
+            background: #111827;
+        }
+        .sidebar::-webkit-scrollbar-thumb {
+            background-color: #4b5563;
+            border-radius: 3px;
+        }
+        .message-enter {
+            animation: messageEnter 0.3s ease-out forwards;
+        }
+        @keyframes messageEnter {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
 </head>
-<body>
-    <div class="container">
-        <h1>বাংলা RAG চ্যাটবট</h1>
-        <div id="chat-container">
-            <div id="chat-history"></div>
-            <div class="input-area">
-                <input type="text" id="user-input" placeholder="আপনার বার্তা লিখুন...">
-                <button id="send-btn">পাঠান</button>
+<body class="bg-gradient-to-br from-gray-900 to-gray-800 h-screen flex text-white">
+    <!-- Sidebar -->
+    <div class="sidebar w-64 bg-gray-900/80 backdrop-blur-lg border-r border-gray-700 flex flex-col h-full overflow-y-auto">
+        <div class="p-4 border-b border-gray-700 flex items-center">
+            <img src="/static/10minutelogo.png" alt="Logo" class="h-10 w-10 mr-2 rounded-lg">
+            <h1 class="text-xl font-semibold">SahityaBot</h1>
+        </div>
+        <button id="new-chat-btn" class="mx-4 mt-4 px-4 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-xl flex items-center justify-center hover:from-red-600 hover:to-red-700 transition-all shadow-lg hover:shadow-red-500/20">
+            <i class="fas fa-plus mr-2"></i> New Chat
+        </button>
+        <div class="mt-4 flex-1 overflow-y-auto">
+            <div id="chat-history" class="space-y-1 px-2">
+                <!-- Chat sessions will be added here -->
+            </div>
+        </div>
+        <div class="p-4 border-t border-gray-700">
+            <div class="flex items-center justify-between">
+                <div class="text-sm text-gray-400">© SahityaBot</div>
+                
             </div>
         </div>
     </div>
-    <script src="/static/js/script.js"></script>
+
+    <!-- Main Chat Area -->
+    <div class="flex-1 flex flex-col h-full overflow-hidden">
+        <!-- Chat Header -->
+        <div class="bg-gray-900/10 border-b border-gray-700 p-4 relative backdrop-blur-lg">
+            <div class="absolute inset-0 flex justify-center items-center pointer-events-none">
+    <div class="bg-white dark:bg-white/10 p-1 rounded-lg shadow-md">
+        <img src="/static/10_Minute_School_Logo.svg.png"
+             alt="10 Minute School Logo"
+             class="h-8 sm:h-10" />
+    </div>
+</div>
+            <div class="flex justify-end">
+                <button class="p-2 text-gray-400 hover:text-red-500 rounded-full hover:bg-gray-800 transition-colors">
+                    <i class="fas fa-cog"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Chat Messages -->
+        <div id="chat-container" class="chat-container flex-1 overflow-y-auto p-4 bg-gradient-to-b from-gray-900/50 to-gray-900/30">
+            <div id="chat-messages" class="space-y-4">
+                <!-- Messages will be added here -->
+            </div>
+        </div>
+
+        <!-- Input Area -->
+        <div class="bg-gray-900/50 border-t border-gray-700 p-4 backdrop-blur-sm">
+            <div class="flex items-center space-x-2">
+                <div class="flex-1 relative">
+                    <input id="user-input" 
+       class="w-full px-4 py-3 bg-gray-800 border border-gray-700 text-white placeholder-white-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:text-white"
+       placeholder="Type your message...">
+                    <button id="send-btn" class="absolute right-2 top-1/2 transform -translate-y-1/2 p-2 text-gray-400 hover:text-red-500 hover:scale-110 transition-transform">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="mt-2 text-xs text-gray-400 text-center">
+                Bangla RAG Chatbot - Powered by Gemini
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentSessionId = generateSessionId();
+        let sessions = {};
+        let isDarkMode = true;
+        
+        // Generate a unique session ID
+        function generateSessionId() {
+            return 'session-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
+        }
+        
+        // Create a new chat session
+        function createNewSession() {
+            currentSessionId = generateSessionId();
+            sessions[currentSessionId] = [];
+            updateChatUI();
+            updateChatHistoryUI();
+            document.getElementById('user-input').focus();
+        }
+        
+        // Load a chat session
+        function loadSession(sessionId) {
+            currentSessionId = sessionId;
+            updateChatUI();
+            document.getElementById('user-input').focus();
+        }
+        
+        // Update the chat messages UI
+        function updateChatUI() {
+            const chatMessages = document.getElementById('chat-messages');
+            chatMessages.innerHTML = '';
+            
+            if (sessions[currentSessionId] && sessions[currentSessionId].length > 0) {
+                sessions[currentSessionId].forEach(msg => {
+                    if (msg.user) {
+                        addMessageToUI('user', msg.user);
+                    }
+                    if (msg.bot) {
+                        addMessageToUI('bot', msg.bot);
+                    }
+                });
+            }
+            
+            scrollToBottom();
+        }
+        
+        // Update the chat history sidebar
+        function updateChatHistoryUI() {
+            const chatHistory = document.getElementById('chat-history');
+            chatHistory.innerHTML = '';
+            
+            Object.keys(sessions).forEach(sessionId => {
+                const sessionItem = document.createElement('div');
+                sessionItem.className = `p-3 rounded-xl cursor-pointer flex items-center mb-1 transition-all ${
+                    sessionId === currentSessionId 
+                    ? 'bg-gray-800/80 border-l-4 border-red-500' 
+                    : 'hover:bg-gray-800/50'
+                }`;
+                sessionItem.innerHTML = `
+                    <i class="fas fa-comment-alt mr-3 text-gray-400"></i>
+                    <span class="truncate flex-1">Chat ${sessionId.split('-')[1]}</span>
+                    ${sessionId === currentSessionId ? '<i class="fas fa-check text-red-500"></i>' : ''}
+                `;
+                sessionItem.addEventListener('click', () => loadSession(sessionId));
+                chatHistory.appendChild(sessionItem);
+            });
+        }
+        
+        // Add a message to the UI
+        function addMessageToUI(sender, message) {
+    const chatMessages = document.getElementById('chat-messages');
+    
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `chat-message ${sender === 'user' ? 'user-message' : 'bot-message'}`;
+    
+    const bubbleDiv = document.createElement('div');
+    bubbleDiv.className = `message-bubble ${
+        sender === 'user' ? 'user-bubble' : 'bot-bubble'
+    } ${message === '...' ? 'streaming-bubble' : ''}`;
+    
+    if (message === '...') {
+        bubbleDiv.innerHTML = `
+            <div class="typing-dots">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        `;
+    } else {
+        bubbleDiv.textContent = message;
+    }
+    
+    messageDiv.appendChild(bubbleDiv);
+    chatMessages.appendChild(messageDiv);
+    
+    scrollToBottom();
+}
+        
+        // Scroll to bottom of chat
+        function scrollToBottom() {
+            setTimeout(() => {
+                const container = document.getElementById('chat-container');
+                container.scrollTop = container.scrollHeight;
+            }, 50);
+        }
+        
+        // Toggle dark/light mode
+        function toggleTheme() {
+            isDarkMode = !isDarkMode;
+            document.body.classList.toggle('bg-gray-50', !isDarkMode);
+            document.body.classList.toggle('text-gray-900', !isDarkMode);
+            document.querySelector('.sidebar').classList.toggle('bg-white/80', !isDarkMode);
+            document.querySelector('.sidebar').classList.toggle('text-gray-900', !isDarkMode);
+            document.getElementById('theme-toggle').innerHTML = isDarkMode ? '<i class="fas fa-moon"></i>' : '<i class="fas fa-sun"></i>';
+        }
+        
+        // Send message to server
+        async function sendMessage() {
+    const input = document.getElementById('user-input');
+    const message = input.value.trim();
+    
+    if (!message) return;
+    
+    // Add user message
+    addMessageToUI('user', message);
+    input.value = '';
+    
+    if (!sessions[currentSessionId]) {
+        sessions[currentSessionId] = [];
+    }
+    
+    sessions[currentSessionId].push({ user: message, bot: '' });
+    
+    // Create a single bot message container that will be updated
+    const chatMessages = document.getElementById('chat-messages');
+    const messageDiv = document.createElement('div');
+    messageDiv.className = 'flex justify-start message-enter';
+    
+    const contentDiv = document.createElement('div');
+    contentDiv.className = 'bg-gray-800/90 text-gray-200 border border-gray-700 shadow-md backdrop-blur-sm rounded-2xl px-4 py-3 max-w-3xl';
+    
+    // Add typing indicator initially
+    contentDiv.innerHTML = `
+        <div class="typing-dots">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    `;
+    
+    messageDiv.appendChild(contentDiv);
+    chatMessages.appendChild(messageDiv);
+    scrollToBottom();
+    
+    try {
+        const response = await fetch('/api/chat', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                session_id: currentSessionId,
+                message: message
+            })
+        });
+        
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let botResponse = '';
+        
+        // Remove typing indicator
+        contentDiv.innerHTML = '';
+        
+        while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            
+            const chunk = decoder.decode(value, { stream: true });
+            botResponse += chunk;
+            
+            // Update the same bubble with new content
+            contentDiv.textContent = botResponse;
+            scrollToBottom();
+        }
+        
+        // Update session history with complete response
+        const sessionIndex = sessions[currentSessionId].length - 1;
+        sessions[currentSessionId][sessionIndex].bot = botResponse;
+        updateChatHistoryUI();
+        
+    } catch (error) {
+        console.error('Error:', error);
+        contentDiv.textContent = 'Sorry, something went wrong. Please try again.';
+    }
+}
+        
+        // Event listeners
+        document.getElementById('send-btn').addEventListener('click', sendMessage);
+        document.getElementById('user-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+        document.getElementById('new-chat-btn').addEventListener('click', createNewSession);
+        document.getElementById('theme-toggle').addEventListener('click', toggleTheme);
+        
+        // Initialize
+        createNewSession();
+    </script>
 </body>
 </html>

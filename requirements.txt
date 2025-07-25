@@ -1,3 +1,6 @@
+pdf2image
+pillow
+pytesseract
 faiss-cpu 
 sentence-transformers
 google-generativeai
@@ -7,3 +10,9 @@ fastapi
 uvicorn
 python-multipart
 python-dotenv
+jinja2
+pandas
+scikit-learn
+ipykernel
+numpy
+transformers
