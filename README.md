@@ -40,7 +40,7 @@ The RAG system:
 1. **Clone the Repository**:
    ```bash
    git clone https://github.com/SadabShiper/SahityaBot-10-MS-Assessment/
-   cd SahityaBot-10-MS-Assessment
+   cd SahityaBot
    ```
 
 2. **Create a Virtual Environment**:
