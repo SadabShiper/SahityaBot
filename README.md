@@ -1,6 +1,14 @@
-# Bangla RAG Chatbot
+# সাহিত্যবট (SahityaBot)
 
 This project implements a simple Multilingual Retrieval-Augmented Generation (RAG) system for answering queries in English and Bengali based on the HSC26 Bangla 1st Paper textbook's "অপরিচিতা" short story. The system extracts text from a PDF, preprocesses and chunks it, stores embeddings in a FAISS index, retrieves relevant chunks using semantic search, and generates answers using the Gemini 1.5 Flash model. A FastAPI-based REST API and a web interface enable user interaction, with evaluation metrics to assess performance.
+
+## Demo Video 
+
+[![Watch the Demo](https://img.youtube.com/vi/Mb_3xnLxorU/0.jpg)](https://youtu.be/Mb_3xnLxorU)
+
+## Web UI Screenshot
+
+![SahityaBot Web Interface](static/demo_screenshot.png)
 
 ## Project Overview
 
